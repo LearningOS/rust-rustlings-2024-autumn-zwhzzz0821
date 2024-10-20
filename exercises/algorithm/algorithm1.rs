@@ -2,7 +2,6 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
@@ -23,19 +22,19 @@ impl<T> Node<T> {
     }
 }
 #[derive(Debug)]
-struct LinkedList<T> {
+struct LinkedList<T: PartialOrd + Clone> {
     length: u32,
     start: Option<NonNull<Node<T>>>,
     end: Option<NonNull<Node<T>>>,
 }
 
-impl<T> Default for LinkedList<T> {
+impl<T: PartialOrd + Clone> Default for LinkedList<T> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<T> LinkedList<T> {
+impl<T: PartialOrd + Clone> LinkedList<T> {
     pub fn new() -> Self {
         Self {
             length: 0,
@@ -69,18 +68,46 @@ impl<T> LinkedList<T> {
             },
         }
     }
-	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
+	pub fn merge(mut list_a:LinkedList<T>,mut list_b:LinkedList<T>) -> Self
 	{
 		//TODO
+        let mut list_c: LinkedList<T> = LinkedList::new();
+        let mut i: i32 = 0;
+        let mut j: i32 = 0;
+        while i < list_a.length as i32 && j < list_b.length as i32 {
+            match list_a.get(i) {
+                Some(a) => match list_b.get(j) {
+                    Some(b) => {
+                        if *a < *b {
+                            list_c.add(a.clone());
+                            i += 1;
+                        } else {
+                            list_c.add(b.clone());
+                            j += 1;
+                        }
+                    },
+                    _ => break
+                },
+                _ => break
+            }
+        };
+        while i < list_a.length as i32 {
+            list_c.add(list_a.get(i).unwrap().clone());
+            i += 1;
+        }
+        while j < list_b.length as i32 {
+            list_c.add(list_b.get(j).unwrap().clone());
+            j += 1;
+        }
 		Self {
-            length: 0,
-            start: None,
-            end: None,
+            length: list_a.length + list_b.length,
+            start: list_c.start,
+            end: list_c.end,
         }
 	}
 }
 
-impl<T> Display for LinkedList<T>
+impl<T: PartialOrd + Clone> Display for LinkedList<T>
 where
     T: Display,
 {

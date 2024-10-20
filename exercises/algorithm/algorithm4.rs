@@ -3,7 +3,6 @@
 	This problem requires you to implement a basic interface for a binary tree
 */
 
-//I AM NOT DONE
 use std::cmp::Ordering;
 use std::fmt::Debug;
 
@@ -37,6 +36,49 @@ where
             right: None,
         }
     }
+
+    fn node_insert(&mut self, value: T) {
+        match value.cmp(&self.value) {
+            Ordering::Less => {
+                if let Some(left) = self.left.as_mut() {
+                    left.node_insert(value);
+                } else {
+                    self.left = Some(Box::new(TreeNode::new(value)));
+                }
+            }
+            Ordering::Greater => {
+                if let Some(right) = self.right.as_mut() {
+                    right.insert(value);
+                } else {
+                    self.right = Some(Box::new(TreeNode::new(value)));
+                }
+            }
+            Ordering::Equal => {
+                // Ignore duplicate values or handle accordingly
+            }
+        }
+    }
+
+    // Search for a value in the subtree
+    fn node_search(&self, value: T) -> bool {
+        match value.cmp(&self.value) {
+            Ordering::Less => {
+                if let Some(left) = self.left.as_ref() {
+                    left.node_search(value)
+                } else {
+                    false
+                }
+            }
+            Ordering::Greater => {
+                if let Some(right) = self.right.as_ref() {
+                    right.node_search(value)
+                } else {
+                    false
+                }
+            }
+            Ordering::Equal => true,
+        }
+    }
 }
 
 impl<T> BinarySearchTree<T>
@@ -50,13 +92,20 @@ where
 
     // Insert a value into the BST
     fn insert(&mut self, value: T) {
-        //TODO
+        if let Some(ref mut root) = self.root {
+            root.node_insert(value);
+        } else {
+            self.root = Some(Box::new(TreeNode::new(value)));
+        }
     }
 
     // Search for a value in the BST
     fn search(&self, value: T) -> bool {
-        //TODO
-        true
+        if let Some(ref root) = self.root {
+            root.node_search(value)
+        } else {
+            false
+        }
     }
 }
 

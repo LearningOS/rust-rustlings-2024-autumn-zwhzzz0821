@@ -38,6 +38,22 @@ where
 
     pub fn add(&mut self, value: T) {
         //TODO
+        self.items.push(value);
+        self.count += 1;
+        let mut index = self.count - 1;
+        loop {
+            let parent_idx = self.parent_idx(index);
+            if (self.comparator)(&self.items[index], &self.items[parent_idx]) {
+                self.items.swap(index, parent_idx);
+                if parent_idx == 0 {
+                    break;
+                } else {
+                    index = parent_idx;
+                }
+            } else {
+                break;
+            }
+        } 
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -85,7 +101,12 @@ where
 
     fn next(&mut self) -> Option<T> {
         //TODO
-		None
+		if self.is_empty() {
+            None
+        } else {
+            let value = self.items.remove(0);
+            Some(value)
+        }
     }
 }
 

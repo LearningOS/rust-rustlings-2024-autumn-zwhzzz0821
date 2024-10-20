@@ -2,7 +2,6 @@
 	heap
 	This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
 
 use std::cmp::Ord;
 use std::default::Default;
@@ -23,7 +22,7 @@ where
     pub fn new(comparator: fn(&T, &T) -> bool) -> Self {
         Self {
             count: 0,
-            items: vec![T::default()],
+            items: vec![],
             comparator,
         }
     }
@@ -57,11 +56,15 @@ where
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
-        idx / 2
+        if idx == 0 {
+            return 0
+        } else {
+            (idx - 1) / 2
+        }
     }
 
     fn children_present(&self, idx: usize) -> bool {
-        self.left_child_idx(idx) <= self.count
+        self.left_child_idx(idx) < self.count
     }
 
     fn left_child_idx(&self, idx: usize) -> usize {
@@ -74,7 +77,26 @@ where
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
         //TODO
-		0
+		let left_idx = self.left_child_idx(idx);
+        let right_idx = self.right_child_idx(idx);
+
+        if right_idx < self.count && (self.comparator)(&self.items[right_idx], &self.items[left_idx]) {
+            right_idx
+        } else {
+            left_idx
+        }
+    }
+
+    fn heapify(&mut self, mut idx: usize) {
+        while self.children_present(idx) {
+            let smallest_child = self.smallest_child_idx(idx);
+            if (self.comparator)(&self.items[smallest_child], &self.items[idx]) {
+                self.items.swap(idx, smallest_child);
+                idx = smallest_child;
+            } else {
+                break;
+            }
+        }
     }
 }
 
@@ -100,13 +122,16 @@ where
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        //TODO
-		if self.is_empty() {
-            None
-        } else {
-            let value = self.items.remove(0);
-            Some(value)
+        if self.is_empty() {
+            return None;
         }
+        
+        let value = self.items.swap_remove(0); // 移动并移除堆顶元素
+        self.count -= 1; // 更新计数
+    
+        self.heapify(0);
+    
+        Some(value)
     }
 }
 
